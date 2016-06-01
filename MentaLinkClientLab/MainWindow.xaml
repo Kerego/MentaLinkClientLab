@@ -4,9 +4,91 @@
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:MentaLinkClientLab"
+		xmlns:i="clr-namespace:System.Windows.Interactivity;assembly=System.Windows.Interactivity"
         mc:Ignorable="d"
         Title="MainWindow" Height="350" Width="525">
+	<i:Interaction.Triggers>
+		<i:EventTrigger EventName="Closed">
+			<i:InvokeCommandAction Command="{Binding CloseCommand}"/>
+		</i:EventTrigger>
+		<i:EventTrigger EventName="Loaded">
+			<i:InvokeCommandAction Command="{Binding LoadCommand}"/>
+		</i:EventTrigger>
+	</i:Interaction.Triggers>
     <Grid>
-        
-    </Grid>
+		<Grid.ColumnDefinitions>
+			<ColumnDefinition Width="*"/>
+			<ColumnDefinition Width="*"/>
+		</Grid.ColumnDefinitions>
+		<Grid.RowDefinitions>
+			<RowDefinition Height="*"/>
+			<RowDefinition Height="*"/>
+		</Grid.RowDefinitions>
+
+
+		<ScrollViewer Grid.Column="1" VerticalScrollBarVisibility="Auto">
+			<ItemsControl x:Name="UserList" BorderThickness="0" Background="#FF44FD66" ItemsSource="{Binding Users}">
+				<ItemsControl.ItemTemplate>
+					<DataTemplate>
+						<TextBlock Text="{Binding}" Margin="5,0,0,0"></TextBlock>
+					</DataTemplate>
+				</ItemsControl.ItemTemplate>
+			</ItemsControl>
+		</ScrollViewer>
+
+		<StackPanel>
+			<TextBox BorderThickness="0" Background="BlanchedAlmond" Text="{Binding GameInputText, UpdateSourceTrigger = PropertyChanged}">
+				<TextBox.InputBindings>
+					<KeyBinding Key="Return" Command="{Binding GameInputCommand}"/>
+				</TextBox.InputBindings>
+			</TextBox>
+			<ItemsControl x:Name="GameList" BorderThickness="0" ItemsSource="{Binding Games}" Background="Bisque" HorizontalContentAlignment="Stretch" VerticalContentAlignment="Stretch">
+				<ItemsControl.Resources>
+					<Style TargetType="ListViewItem">
+						<Setter Property="Padding" Value="0"/>
+					</Style>
+				</ItemsControl.Resources>
+				<ItemsControl.ItemTemplate>
+					<DataTemplate>
+						<Grid HorizontalAlignment="Stretch" IsEnabled="{Binding NotJoined}" VerticalAlignment="Stretch">
+							<Grid.Style>
+								<Style TargetType="Grid">
+									<Style.Triggers>
+										<Trigger Property="IsEnabled" Value="True">
+											<Setter Property="Background" Value="Bisque"></Setter>
+										</Trigger>
+										<Trigger Property="IsEnabled" Value="False">
+											<Setter Property="Background" Value="Gray"></Setter>
+										</Trigger>
+									</Style.Triggers>
+								</Style>
+							</Grid.Style>
+							<Grid.InputBindings>
+								<MouseBinding 
+									MouseAction="LeftDoubleClick" 
+									Command="{Binding DataContext.GameSelectedCommand, ElementName=GameList}"
+									CommandParameter="{Binding }"/>
+							</Grid.InputBindings>
+							<TextBlock Text="{Binding Name}" HorizontalAlignment="Left" Margin="5,0,0,0"/>
+							<TextBlock Text="{Binding Players}" HorizontalAlignment="Right" Margin="0,0,5,0"/>
+						</Grid>
+
+					</DataTemplate>
+				</ItemsControl.ItemTemplate>
+			</ItemsControl>
+		</StackPanel>
+
+
+		<ScrollViewer Grid.Row="1" Grid.ColumnSpan="2" VerticalScrollBarVisibility="Auto">
+			<ItemsControl x:Name="AnnounceList" BorderThickness="0" ItemsSource="{Binding Announcements}">
+				<ItemsControl.ItemTemplate>
+					<DataTemplate>
+						<TextBlock Text="{Binding}" Margin="8,0,0,0" FontSize="20"></TextBlock>
+					</DataTemplate>
+				</ItemsControl.ItemTemplate>
+			</ItemsControl>
+		</ScrollViewer>
+
+
+	</Grid>
 </Window>
