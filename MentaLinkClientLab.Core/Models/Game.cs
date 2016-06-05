@@ -1,6 +1,6 @@
-﻿using MentaLinkClientLab.ViewModels;
+﻿using Prism.Mvvm;
 
-namespace MentaLinkClientLab.Models
+namespace MentaLinkClientLab.Core.Models
 {
 	public class Game : BindableBase
 	{

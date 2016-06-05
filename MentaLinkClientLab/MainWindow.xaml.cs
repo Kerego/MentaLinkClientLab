@@ -1,17 +1,21 @@
-﻿using MentaLinkClientLab.ViewModels;
+﻿using MentaLinkClientLab.Core;
+using MentaLinkClientLab.Core.ViewModels;
 using System.Windows;
-using uPLibrary.Networking.M2Mqtt;
 
 namespace MentaLinkClientLab
 {
-
 	public partial class MainWindow : Window
 	{
-		MainWindowViewModel viewModel;
-		public MainWindow(MqttClient client, string id, string user, string host)
+		MainViewModel viewModel;
+		public MainWindow(IMqttClient client)
 		{
-			viewModel = new MainWindowViewModel(client, id, user, host);
-			this.Title = user;
+			viewModel = new MainViewModel(client,
+			game => 
+			{
+				GameWindow window = new GameWindow(game);
+				window.Show();
+			});
+			this.Title = Session.User;
 			this.DataContext = viewModel;
 			InitializeComponent();
 		}

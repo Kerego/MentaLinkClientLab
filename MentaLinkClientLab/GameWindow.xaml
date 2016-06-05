@@ -4,45 +4,59 @@
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:MentaLinkClientLab"
+		xmlns:i="clr-namespace:System.Windows.Interactivity;assembly=System.Windows.Interactivity"
         mc:Ignorable="d" Height="300" Width="300" MinWidth="250" MinHeight="250">
-		<Grid VerticalAlignment="Stretch" HorizontalAlignment="Stretch">
-			<Grid.ColumnDefinitions>
-				<ColumnDefinition Width="7*"/>
-				<ColumnDefinition Width="3*"/>
-			</Grid.ColumnDefinitions>
-			<Grid.RowDefinitions>
-				<RowDefinition Height="5*"/>
-				<RowDefinition Height="2*"/>
-				<RowDefinition Height="Auto"/>
-			</Grid.RowDefinitions>
-			<Image x:Name="ImageView" HorizontalAlignment="Stretch" VerticalAlignment="Stretch"/>
-			<ItemsControl Name="UserList" 
-						  Grid.Column="1" 
-						  BorderThickness="0"
-						  Background="Gainsboro">
+	<i:Interaction.Triggers>
+		<i:EventTrigger EventName="Closed">
+			<i:InvokeCommandAction Command="{Binding CloseCommand}"/>
+		</i:EventTrigger>
+		<i:EventTrigger EventName="Loaded">
+			<i:InvokeCommandAction Command="{Binding LoadCommand}"/>
+		</i:EventTrigger>
+	</i:Interaction.Triggers>
+	<Grid VerticalAlignment="Stretch" HorizontalAlignment="Stretch">
+		<Grid.ColumnDefinitions>
+			<ColumnDefinition Width="7*"/>
+			<ColumnDefinition Width="3*"/>
+		</Grid.ColumnDefinitions>
+		<Grid.RowDefinitions>
+			<RowDefinition Height="5*"/>
+			<RowDefinition Height="2*"/>
+			<RowDefinition Height="Auto"/>
+		</Grid.RowDefinitions>
+		<Image x:Name="ImageView" Source="{Binding ImageSource}" HorizontalAlignment="Stretch" VerticalAlignment="Stretch"/>
+		<ItemsControl Name="UserList" 
+						Grid.Column="1" 
+						BorderThickness="0"
+						Background="Gainsboro">
+			<ItemsControl.ItemTemplate>
+				<DataTemplate>
+					<TextBlock Text="{Binding}"></TextBlock>
+				</DataTemplate>
+			</ItemsControl.ItemTemplate>
+		</ItemsControl>
+
+		<ScrollViewer	ScrollChanged="ScrollViewer_ScrollChanged" 
+						Grid.ColumnSpan="2" 
+						Grid.Row="1"
+						VerticalScrollBarVisibility="Auto">
+			<ItemsControl Name="ChatList" 
+							BorderThickness="0"
+							Background="Chartreuse"
+							ItemsSource="{Binding Announcements}">
 				<ItemsControl.ItemTemplate>
 					<DataTemplate>
-						<TextBlock Text="{Binding}"></TextBlock>
+						<Viewbox VerticalAlignment="Stretch" MaxHeight="40" HorizontalAlignment="Stretch" Stretch="Uniform">
+							<TextBlock Text="{Binding}"/>
+						</Viewbox>
 					</DataTemplate>
 				</ItemsControl.ItemTemplate>
-		</ItemsControl>
-		
-			<ScrollViewer	ScrollChanged="ScrollViewer_ScrollChanged" 
-							Grid.ColumnSpan="2" 
-							Grid.Row="1"
-							VerticalScrollBarVisibility="Auto">
-				<ItemsControl Name="ChatList" 
-							  BorderThickness="0"
-							  Background="Chartreuse">
-					<ItemsControl.ItemTemplate>
-						<DataTemplate>
-							<Viewbox VerticalAlignment="Stretch" MaxHeight="40" HorizontalAlignment="Stretch" Stretch="Uniform">
-								<TextBlock Text="{Binding}"/>
-							</Viewbox>
-						</DataTemplate>
-					</ItemsControl.ItemTemplate>
-				</ItemsControl>
-			</ScrollViewer>
-		<TextBox Name="InputBox" IsEnabled="False" KeyDown="TextBox_KeyDown" Grid.Row="2" Grid.ColumnSpan="2" BorderThickness="0" Background="Bisque" ></TextBox>
-		</Grid>
+			</ItemsControl>
+		</ScrollViewer>
+		<TextBox Name="InputBox" Text="{Binding Answer, UpdateSourceTrigger=PropertyChanged}" Grid.Row="2" Grid.ColumnSpan="2" BorderThickness="0" Background="Bisque" >
+			<TextBox.InputBindings>
+				<KeyBinding Key="Return" Command="{Binding AnswerCommand}"/>
+			</TextBox.InputBindings>
+		</TextBox>
+	</Grid>
 </Window>
