@@ -1,0 +1,83 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://xamarin.com/schemas/2014/forms"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+				xmlns:local="clr-namespace:MentaMobile;assembly=MentaMobile"
+             x:Class="MentaMobile.GamePage">
+	<Grid BackgroundColor="{x:Static local:Colors.Main}">
+		<Grid.ColumnDefinitions>
+			<ColumnDefinition Width="*"/>
+			<ColumnDefinition Width="Auto"/>
+		</Grid.ColumnDefinitions>
+		<Grid.RowDefinitions>
+			<RowDefinition Height="2*"/>
+			<RowDefinition Height="2*"/>
+			<RowDefinition Height="Auto"/>
+		</Grid.RowDefinitions>
+
+
+		<!--<ListView ItemsSource="{Binding Game.Players}" Margin="10,10,10,10" BackgroundColor="{x:Static local:Colors.Third}">
+			<ListView.Header>
+				<Label HorizontalOptions="Center" FontSize="30" TextColor="White" Margin="5" Text="Players"/>
+			</ListView.Header>
+			<ListView.ItemTemplate>
+				<DataTemplate>
+					<ViewCell>
+						<ContentView Margin="1" BackgroundColor="{x:Static local:Colors.Main}">
+							<Label Text="{Binding}" FontSize="20" HorizontalOptions="Center" TextColor="White"></Label>
+						</ContentView>
+					</ViewCell>
+				</DataTemplate>
+			</ListView.ItemTemplate>
+		</ListView>-->
+		
+		<Grid>
+			<Grid.ColumnDefinitions>
+				<ColumnDefinition/>
+				<ColumnDefinition/>
+			</Grid.ColumnDefinitions>
+			<ContentView Margin="10" BackgroundColor="{x:Static local:Colors.Third}">
+				<StackLayout VerticalOptions="Center" HorizontalOptions="Center">
+					<Label Text="Round" TextColor="White" FontSize="30" VerticalOptions="Center" HorizontalOptions="Center"></Label>
+					<Label Text="{Binding Round}" TextColor="White" FontSize="30" VerticalOptions="Center" HorizontalOptions="Center"></Label>
+				</StackLayout>
+			</ContentView>
+			<ContentView Margin="10" Grid.Column="1" BackgroundColor="{x:Static local:Colors.Third}">
+				<StackLayout VerticalOptions="Center" HorizontalOptions="Center">
+					<Label Text="Points" TextColor="White" FontSize="30" VerticalOptions="Center" HorizontalOptions="Center"></Label>
+					<Label Text="{Binding Points}" TextColor="White" FontSize="30" VerticalOptions="Center" HorizontalOptions="Center"></Label>
+				</StackLayout>
+			</ContentView>
+		</Grid>
+		<ContentView 
+				Grid.Row="1"
+				Margin="10"
+				BackgroundColor="{x:Static local:Colors.Third}">
+			<Image 
+					VerticalOptions="Fill"
+					HorizontalOptions="Fill"
+					Source="{Binding ImageSource}"
+					Margin="5"
+				   />
+		</ContentView>
+		<Label Text="{Binding Announcement, Mode=TwoWay}" 
+				VerticalOptions="Center" 
+				HorizontalOptions="Center"
+				FontSize="25"
+				TextColor="White"
+				Grid.Row="1"
+				/>
+
+		<ActivityIndicator Grid.Row="1" 
+					 Grid.ColumnSpan="2"
+					 IsRunning="{Binding IsLoading}"
+					 VerticalOptions="Center"
+					 Margin="0,100,0,0"
+					 />
+		<Entry 	 x:Name="InputBox"
+						 Text="{Binding Answer, Mode=TwoWay}"
+						 Grid.Row="2"
+						 Grid.ColumnSpan="2"
+						 Margin="10,10,10,0">
+		</Entry>
+	</Grid>
+</ContentPage>

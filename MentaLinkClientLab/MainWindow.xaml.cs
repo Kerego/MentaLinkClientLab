@@ -14,7 +14,7 @@ namespace MentaLinkClientLab
 			{
 				GameWindow window = new GameWindow(game);
 				window.Show();
-			});
+			}, () => { });
 			this.Title = Session.User;
 			this.DataContext = viewModel;
 			InitializeComponent();

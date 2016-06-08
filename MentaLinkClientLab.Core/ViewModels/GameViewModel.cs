@@ -142,8 +142,8 @@ namespace MentaLinkClientLab.Core.ViewModels
 		{
 			if (e.Topic == GameControl + _game.Name + "_announcements")
 			{
-				var response = e.Payload.ToDynamic();
-				switch ((string)response.type)
+				var response = e.Payload.Deserialize();
+				switch (response["type"].ToObject<string>())
 				{
 					case "announce_end_game":
 						if (_gameStarted)
@@ -153,12 +153,12 @@ namespace MentaLinkClientLab.Core.ViewModels
 						ImageSource = null;
 						break;
 					case "announce_next_round":
-						NotifyUser($"+{(string)response.points} Points");
-						Points += (int)response.points;
+						NotifyUser($"+{response["points"].ToObject<int>()} Points");
+						Points += response["points"].ToObject<int>();
 						Round++;
 						break;
 					case "announce_start_game":
-						NotifyUser((string)response.payload);
+						NotifyUser(response["payload"].ToObject<string>());
 						_gameStarted = true;
 						break;
 					default:
@@ -175,7 +175,7 @@ namespace MentaLinkClientLab.Core.ViewModels
 		}
 
 
-		public async Task SendAnswer()
+		public async Task SendAnswer(string answer = null)
 		{
 			if(!_gameStarted)
 			{
@@ -187,7 +187,7 @@ namespace MentaLinkClientLab.Core.ViewModels
 			{
 				type = "answer",
 				gamename = _game.Name,
-				payload = Answer,
+				payload = answer ?? Answer,
 				id = Id
 			};
 

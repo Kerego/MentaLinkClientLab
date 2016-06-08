@@ -26,7 +26,7 @@
 						<AdaptiveTrigger MinWindowWidth="1100" />
 					</VisualState.StateTriggers>
 					<VisualState.Setters>
-						<Setter Target="ImageContainer.MaxWidth" Value="800" />
+						<Setter Target="ImageContainer.Width" Value="800" />
 						<Setter Target="ImageContainer.(Grid.Column)" Value="1" />
 						<Setter Target="ImageContainer.(Grid.Row)" Value="0" />
 						<Setter Target="ImageContainer.(Grid.RowSpan)" Value="3" />
@@ -37,7 +37,7 @@
 						<AdaptiveTrigger MinWindowWidth="800" />
 					</VisualState.StateTriggers>
 					<VisualState.Setters>
-						<Setter Target="ImageContainer.MaxWidth" Value="500" />
+						<Setter Target="ImageContainer.Width" Value="500" />
 						<Setter Target="ImageContainer.(Grid.Column)" Value="1" />
 						<Setter Target="ImageContainer.(Grid.Row)" Value="0" />
 						<Setter Target="ImageContainer.(Grid.RowSpan)" Value="3" />
@@ -116,8 +116,8 @@
 				Grid.Row="2"
 				TextWrapping="Wrap"
 				/>
-
 		<ProgressBar Grid.Row="2" 
+					 Grid.ColumnSpan="2"
 					 IsIndeterminate="{Binding IsLoading}"
 					 Value="{Binding TimeLeft, Mode=TwoWay}"
 					 Maximum="{Binding Game.Timeout}"
@@ -126,7 +126,6 @@
 					 Height="10"
 					 Margin="10,0,10,0"
 					 />
-
 		<TextBox Name="InputBox"
 				 Text="{Binding Answer, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
 				 KeyDown="InputBox_KeyDown"

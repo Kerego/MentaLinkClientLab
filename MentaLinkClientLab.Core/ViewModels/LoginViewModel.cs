@@ -1,6 +1,8 @@
 ﻿using Prism.Commands;
 using Prism.Mvvm;
 using System;
+using System.Diagnostics;
+using System.Linq;
 using System.Threading.Tasks;
 using System.Windows.Input;
 
@@ -9,7 +11,6 @@ namespace MentaLinkClientLab.Core.ViewModels
 	public class LoginViewModel : BindableBase
 	{
 		private string _host;
-
 		public string Host
 		{
 			get { return _host; }
@@ -17,7 +18,6 @@ namespace MentaLinkClientLab.Core.ViewModels
 		}
 
 		private string _user;
-
 		public string User
 		{
 			get { return _user; }
@@ -25,12 +25,13 @@ namespace MentaLinkClientLab.Core.ViewModels
 		}
 
 		private bool _isConnecting;
-
 		public bool IsConnecting
 		{
 			get { return _isConnecting; }
 			set { _isConnecting = value; OnPropertyChanged(); OnPropertyChanged(() => CommandActionText); }
 		}
+
+
 
 		public string CommandActionText { get { return _isConnecting ? "Cancel" : "Connect"; } }
 
@@ -86,8 +87,8 @@ namespace MentaLinkClientLab.Core.ViewModels
 				while (_isConnecting)
 				{
 					var msg = await _client.ReceiveAsync();
-					var response = msg.Payload.ToDynamic();
-					if (response.type == "connect" && response.status == "ok" && _isConnecting)
+					var response = msg.Payload.Deserialize();
+					if (response["type"].ToObject<string>() == "connect" && response["status"].ToObject<string>() == "ok" && _isConnecting)
 					{
 						Session.Host = Host;
 						Session.GameControl = gameControl;
@@ -100,9 +101,9 @@ namespace MentaLinkClientLab.Core.ViewModels
 				if (!_isConnecting)
 					await _client.UnSubscribeAsync(new string[] { myTopic });
 			}
-			catch
+			catch(Exception e)
 			{
-
+				Debug.WriteLine(e.Message);
 			}
 			
 		}

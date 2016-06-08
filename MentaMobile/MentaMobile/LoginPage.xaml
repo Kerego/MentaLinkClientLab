@@ -1,0 +1,30 @@
+﻿<ContentPage xmlns="http://xamarin.com/schemas/2014/forms"
+						 xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+						 xmlns:local="clr-namespace:MentaMobile;assembly=MentaMobile"
+						 x:Class="MentaMobile.LoginPage">
+	<Grid BackgroundColor="{x:Static local:Colors.Main}">
+		<StackLayout VerticalOptions="Center" HorizontalOptions="Center">
+			<Entry Placeholder="Host"
+						 HorizontalOptions="Center"
+						 VerticalOptions="Center"
+						 WidthRequest="140"
+						 Text="{Binding Host, Mode=TwoWay}">
+			</Entry>
+			<Entry Placeholder="User"
+						 HorizontalOptions="Center"
+						 VerticalOptions="Center"
+						 WidthRequest="140"
+						 Text="{Binding User, Mode=TwoWay}">
+			</Entry>
+			<Button Command="{Binding ConnectCommand}"
+							Text="{Binding CommandActionText}"
+							BackgroundColor="{x:Static local:Colors.Second}"
+							TextColor="White"
+							MinimumWidthRequest="140"
+							HorizontalOptions="Center"/>
+			
+			<ActivityIndicator IsRunning="{Binding IsConnecting}"></ActivityIndicator>
+		</StackLayout>
+	
+	</Grid>
+</ContentPage>
