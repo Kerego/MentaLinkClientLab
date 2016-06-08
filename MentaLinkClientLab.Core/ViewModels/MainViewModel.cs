@@ -5,6 +5,7 @@ using Prism.Mvvm;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.Diagnostics;
 using System.Linq;
 using System.Threading.Tasks;
 using System.Windows.Input;
@@ -14,80 +15,76 @@ namespace MentaLinkClientLab.Core.ViewModels
 {
 	public class MainViewModel : BindableBase
 	{
-		private IMqttClient _client;
-		private string _gameInputText;
-		private Action<string> _joinGameAction;
+		private Game _selectedGame;
 
-		public string GameInputText
+		public Game SelectedGame
 		{
-			get { return _gameInputText; }
-			set { _gameInputText = value; OnPropertyChanged(); }
+			get { return _selectedGame; }
+			set { _selectedGame = value; OnPropertyChanged(); JoinGameCommand.RaiseCanExecuteChanged(); }
 		}
-		public ICommand GameSelectedCommand { get; set; }
-		public ICommand GameInputCommand { get; set; }
-		public ICommand CloseCommand { get; set; }
-		public ICommand LoadCommand { get; set; }
+
+		public DelegateCommand JoinGameCommand { get; set; }
+		public DelegateCommand CreateGameCommand { get; set; }
+		public DelegateCommand CloseCommand { get; set; }
+		public DelegateCommand LoadCommand { get; set; }
 		public ObservableCollection<string> Announcements { get; set; } = new ObservableCollection<string>();
 		public ObservableCollection<string> Users { get; set; } = new ObservableCollection<string>();
 		public ObservableCollection<Game> Games { get; set; } = new ObservableCollection<Game>();
+		
+		private IMqttClient _client;
+		private Action<Game> _joinGameAction;
+		private Action _createGameAction;
 
 
-		public MainViewModel(IMqttClient client, Action<string> joinGameAction)
+		public MainViewModel(IMqttClient client, Action<Game> joinGameAction, Action createGameAction)
 		{
 			_client = client;
 			_joinGameAction = joinGameAction;
+			_createGameAction = createGameAction;
 
-			GameSelectedCommand = new DelegateCommand<Game>(async x => await Join(x), x => x.NotJoined == true);
-			GameInputCommand = new DelegateCommand(async () => await GameInput());
+			JoinGameCommand = new DelegateCommand(() => Join(SelectedGame), () => SelectedGame?.NotJoined == true);
+			CreateGameCommand = new DelegateCommand(_createGameAction.Invoke);
 			CloseCommand = new DelegateCommand(Close);
 			LoadCommand = new DelegateCommand(async () => await Load());
 		}
 
-		private async Task Join(Game game)
+		private void Join(Game game)
 		{
 			if (game.Name == null)
 				return;
 			game.NotJoined = false;
-
-			var message = new
-			{
-				type = "join",
-				gamename = game.Name,
-				id = Id
-			};
-			await _client.SendAsync(GameControl, message.ToByteArray());
-
-			_joinGameAction?.Invoke(game.Name);
+			JoinGameCommand.RaiseCanExecuteChanged();
+			_joinGameAction?.Invoke(game);
 		}
 
 
 		private async Task Load()
 		{
 			_client.Subscribe(new string[] { "Announcements" + Host }, new byte[] { 2 });
+			await RequestList("userlist");
+			await RequestList("gamelist");
+			await ProcessMessages();
+		}
 
+		private async Task RequestList(string listType)
+		{
 			var message = new
 			{
-				type = "userlist",
-				username = User,
-				id = Id
-			};
-
-			var gameListMessage = new
-			{
-				type = "gamelist",
+				type = listType,
 				username = User,
 				id = Id
 			};
 
 			await _client.SendAsync(GameControl, message.ToByteArray());
-			await _client.SendAsync(GameControl, gameListMessage.ToByteArray());
+		}
 
+		public async Task ProcessMessages()
+		{
 			while (true)
 			{
 				var msg = await _client.ReceiveAsync();
 				HandleMessage(msg);
 			}
-
 		}
 
 		public void Close()
@@ -121,13 +118,16 @@ namespace MentaLinkClientLab.Core.ViewModels
 				{
 					Games.Clear();
 					foreach (var item in response.payload)
-						Games.Add(new Game { Name = item.Name, Players = item.Value.Count, NotJoined = true });
+						Games.Add(new Game {
+									Name = item.Name,
+									Players = new ObservableCollection<string>(((JArray)item.Value).ToObject<string[]>()), NotJoined = true
+									});
 				}
 			}
 
 			else if (msg.Topic == "Announcements" + Host ) 
 			{
-				Announcements.Add((string)response.payload);
+				Announcements.Insert(0, (string)response.payload);
 				switch ((string)response.type)
 				{
 					case "announce_connect":
@@ -136,11 +136,16 @@ namespace MentaLinkClientLab.Core.ViewModels
 					case "announce_exit":
 						var exitedGames = (response.gamenames as IEnumerable<object>).Select(x=>(string)((JValue)x).Value);
 						foreach (var game in Games.Where(x => exitedGames.Contains(x.Name)))
-							game.Players--;
+							game.Players.Remove((string)response.username);
 						Users.Remove((string)response.username);
 						break;
 					case "announce_new_game":
-						Games.Add(new Game { Name = response.gamename, NotJoined = true});
+						Games.Add(new Game {
+							Name = response.gamename,
+							Timeout = response.timeout,
+							InitialTimeout = response.itimeout,
+							AnswersForMatch = response.answers,
+							NotJoined = true});
 						break;
 					case "announce_start_game":
 						Games.Remove(Games.SingleOrDefault(x => x.Name == (string)response.gamename));
@@ -149,31 +154,15 @@ namespace MentaLinkClientLab.Core.ViewModels
 						Games.Remove(Games.SingleOrDefault(x => x.Name == (string)response.gamename));
 						break;
 					case "announce_join_game":
-						Games.SingleOrDefault(x => x.Name == (string)response.gamename).Players++;
+						var g = Games.SingleOrDefault(x => x.Name == (string)response.gamename);
+						if(g != null)
+							g.Players.Add((string)response.username);
 						break;
 					default:
 						break;
 				}
 			}
 		}
-
-		private async Task GameInput()
-		{
-			if (String.IsNullOrWhiteSpace(_gameInputText))
-				return;
-
-			var message = new
-			{
-				type = "newgame",
-				gamename = _gameInputText,
-				id = Id,
-			};
-
-			_gameInputText = string.Empty;
-
-			await _client.SendAsync(GameControl, message.ToByteArray());
-		}
-		
 
 
 	}

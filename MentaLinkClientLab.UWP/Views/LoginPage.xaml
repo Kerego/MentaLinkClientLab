@@ -6,10 +6,32 @@
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     mc:Ignorable="d">
-	<StackPanel HorizontalAlignment="Center" VerticalAlignment="Center" Background="Wheat">
-		<TextBox Name="HostBox" PlaceholderText="Host" HorizontalAlignment="Center" MinWidth="140" VerticalAlignment="Center" Text="{x:Bind viewModel.Host, Mode=TwoWay}"></TextBox>
-		<TextBox Name="UserBox" PlaceholderText="User" HorizontalAlignment="Center" MinWidth="140" VerticalAlignment="Center" Text="{Binding User, Mode=TwoWay}"></TextBox>
-		<Button Command="{Binding ConnectCommand}" Content="Connect" VerticalAlignment="Center"></Button>
-		<TextBlock Name="ConnectLabel" Text="{Binding Info}"></TextBlock>
-	</StackPanel>
+	<Grid Background="{StaticResource MainColor}">
+		<StackPanel VerticalAlignment="Center" HorizontalAlignment="Center">
+			<TextBox Name="HostBox" 
+					 PlaceholderText="Host" 
+					 HorizontalAlignment="Center" 
+					 MinWidth="140" 
+					 VerticalAlignment="Center" 
+					 BorderThickness="0"
+					 Background="White"
+					 Text="{x:Bind viewModel.Host, Mode=TwoWay}"/>
+			<TextBox Name="UserBox" 
+					 PlaceholderText="User" 
+					 HorizontalAlignment="Center" 
+					 MinWidth="140" 
+					 BorderThickness="0"
+					 Background="White"
+					 VerticalAlignment="Center" 
+					 Text="{Binding User, Mode=TwoWay}"></TextBox>
+			<Button Command="{Binding ConnectCommand}" 
+					Content="{Binding CommandActionText}"
+					Background="{StaticResource SecondColor}"
+					Foreground="White"
+					MinWidth="140"
+					HorizontalAlignment="Center"></Button>
+			<ProgressRing IsActive="{Binding IsConnecting}" Margin="5" Width="80">
+			</ProgressRing>
+		</StackPanel>
+	</Grid>
 </Page>

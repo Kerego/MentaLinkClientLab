@@ -12,6 +12,8 @@ namespace MentaLinkClientLab.Core
 		Task SendAsync(string topic, byte[] payload);
 		Task<Message> ReceiveAsync();
 		void Subscribe(string[] topics, byte[] qualityService);
+		void UnSubscribe(string[] topics);
 		Task SubscribeAsync(string[] topics, byte[] qualityService);
+		Task UnSubscribeAsync(string[] topics);
 	}
 }

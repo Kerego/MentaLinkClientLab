@@ -43,12 +43,27 @@
 			<ItemsControl Name="ChatList" 
 							BorderThickness="0"
 							Background="Chartreuse"
-							ItemsSource="{Binding Announcements}">
+							ItemsSource="{Binding Announcements}" RenderTransformOrigin="0.5,0.5">
+				<ItemsControl.RenderTransform>
+					<TransformGroup>
+						<ScaleTransform ScaleY="-1" ScaleX="1"/>
+						<SkewTransform AngleY="0" AngleX="0"/>
+						<RotateTransform Angle="0"/>
+						<TranslateTransform/>
+					</TransformGroup>
+				</ItemsControl.RenderTransform>
 				<ItemsControl.ItemTemplate>
 					<DataTemplate>
-						<Viewbox VerticalAlignment="Stretch" MaxHeight="40" HorizontalAlignment="Stretch" Stretch="Uniform">
-							<TextBlock Text="{Binding}"/>
-						</Viewbox>
+							<TextBlock Text="{Binding}" RenderTransformOrigin="0.5,0.5">
+							<TextBlock.RenderTransform>
+								<TransformGroup>
+									<ScaleTransform ScaleY="-1" ScaleX="1"/>
+									<SkewTransform AngleY="0" AngleX="0"/>
+									<RotateTransform Angle="0"/>
+									<TranslateTransform/>
+								</TransformGroup>
+							</TextBlock.RenderTransform>
+						</TextBlock>
 					</DataTemplate>
 				</ItemsControl.ItemTemplate>
 			</ItemsControl>

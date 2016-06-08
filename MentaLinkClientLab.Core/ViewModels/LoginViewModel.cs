@@ -24,13 +24,16 @@ namespace MentaLinkClientLab.Core.ViewModels
 			set { _user = value; OnPropertyChanged(); }
 		}
 
-		private string _info;
+		private bool _isConnecting;
 
-		public string Info
+		public bool IsConnecting
 		{
-			get { return _info; }
-			set { _info = value; OnPropertyChanged(); }
+			get { return _isConnecting; }
+			set { _isConnecting = value; OnPropertyChanged(); OnPropertyChanged(() => CommandActionText); }
 		}
+
+		public string CommandActionText { get { return _isConnecting ? "Cancel" : "Connect"; } }
+
 
 		Action _onConnect;
 		IMqttClient _client;
@@ -42,45 +45,66 @@ namespace MentaLinkClientLab.Core.ViewModels
 			_onConnect = onConnect;
 			_client = client;
 			_userId = Guid.NewGuid(); ;
-			client.Connect(_userId.ToString());
 			Host = "_AA";
-
 			ConnectCommand = new DelegateCommand(async () => await Connect());
+			try
+			{
+				_client.Connect(_userId.ToString());
+			}
+			catch
+			{
+
+			}
 		}
 
 		private async Task Connect()
 		{
-			Info = "Connecting...";
-
-			string gameControl = "GameControl" + Host;
-			var myTopic = gameControl + User + _userId.ToString();
-
-			var message = new
+			if(_isConnecting)
 			{
-				type = "connect",
-				username = User,
-				id = _userId.ToString()
-			};
-
-			_client.Send(gameControl, message.ToByteArray());
-
-			_client.Subscribe(new string[] { myTopic },
-				new byte[] { 2 });
-
-			while (true)
-			{
-				var msg = await _client.ReceiveAsync();
-				var response = msg.Payload.ToDynamic();
-				if (response.type == "connect" && response.status == "ok")
-				{
-					Session.Host = Host;
-					Session.GameControl = gameControl;
-					Session.User = User;
-					Session.Id = _userId;
-					_onConnect.Invoke();
-					break;
-				}
+				IsConnecting = false;
+				return;
 			}
+
+			IsConnecting = true;
+
+			try
+			{
+				string gameControl = "GameControl" + Host;
+				string myTopic = gameControl + User + _userId.ToString();
+
+				var message = new
+				{
+					type = "connect",
+					username = User,
+					id = _userId.ToString()
+				};
+
+				_client.Subscribe(new string[] { myTopic },
+					new byte[] { 2 });
+				_client.Send(gameControl, message.ToByteArray());
+
+				while (_isConnecting)
+				{
+					var msg = await _client.ReceiveAsync();
+					var response = msg.Payload.ToDynamic();
+					if (response.type == "connect" && response.status == "ok" && _isConnecting)
+					{
+						Session.Host = Host;
+						Session.GameControl = gameControl;
+						Session.User = User;
+						Session.Id = _userId;
+						_onConnect.Invoke();
+						break;
+					}
+				}
+				if (!_isConnecting)
+					await _client.UnSubscribeAsync(new string[] { myTopic });
+			}
+			catch
+			{
+
+			}
+			
 		}
 	}
 }

@@ -6,6 +6,7 @@ using MentaLinkClientLab.Core.ViewModels;
 using static MentaLinkClientLab.Core.Session;
 using MentaLinkClientLab.Core.Helpers;
 using System.Windows.Media;
+using MentaLinkClientLab.Core.Models;
 
 namespace MentaLinkClientLab
 {
@@ -14,7 +15,7 @@ namespace MentaLinkClientLab
 	/// </summary>
 	public partial class GameWindow : Window
 	{
-		public GameWindow(string game)
+		public GameWindow(Game game)
 		{
 			Title = $"Game: {game} User: {User}";
 			InitializeComponent();

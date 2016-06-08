@@ -4,5 +4,9 @@
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
     xmlns:local="using:MentaLinkClientLab.UWP"
     RequestedTheme="Light">
-
+	<Application.Resources>
+		<SolidColorBrush Color="#505160" x:Key="MainColor"></SolidColorBrush>
+		<SolidColorBrush Color="#598234" x:Key="SecondColor"></SolidColorBrush>
+		<SolidColorBrush Color="#68829E" x:Key="ThirdColor"></SolidColorBrush>
+	</Application.Resources>
 </Application>
